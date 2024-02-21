@@ -20,6 +20,7 @@ import com.dat3m.dartagnan.verification.VerificationTask;
 import com.dat3m.dartagnan.verification.VerificationTask.VerificationTaskBuilder;
 import com.dat3m.dartagnan.verification.model.ExecutionModel;
 import com.dat3m.dartagnan.verification.solving.*;
+import com.dat3m.dartagnan.verification.spectre.SpectreSolver;
 import com.dat3m.dartagnan.witness.WitnessBuilder;
 import com.dat3m.dartagnan.witness.WitnessGraph;
 import com.dat3m.dartagnan.wmm.Wmm;
@@ -150,6 +151,12 @@ public class Dartagnan extends BaseOptions {
                         System.exit(1);
                     }
                     modelChecker = DataRaceSolver.run(ctx, prover, task);
+                } else if (properties.contains(SPECTRE)) {
+                    /*if (properties.size() > 1) {
+                        System.out.println("Spectre detection cannot be combined with other properties");
+                        System.exit(1);
+                    }*/
+                    modelChecker = SpectreSolver.run(ctx, prover, task);
                 } else {
                     // Property is either PROGRAM_SPEC, LIVENESS, or CAT_SPEC
                     switch (o.getMethod()) {

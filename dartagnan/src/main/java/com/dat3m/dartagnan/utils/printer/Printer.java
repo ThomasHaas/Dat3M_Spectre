@@ -4,6 +4,7 @@ import com.dat3m.dartagnan.program.Function;
 import com.dat3m.dartagnan.program.Program;
 import com.dat3m.dartagnan.program.Thread;
 import com.dat3m.dartagnan.program.event.Event;
+import com.dat3m.dartagnan.program.event.Tag;
 import com.dat3m.dartagnan.program.event.core.Init;
 import com.dat3m.dartagnan.program.event.core.Label;
 import com.dat3m.dartagnan.program.event.core.Skip;
@@ -114,7 +115,11 @@ public class Printer {
                 result.append("   ");
             }
             result.append(padding, idSb.length(), padding.length());
-            result.append(event).append("\n");
+            result.append(event);
+            if (event.hasTag(Tag.SPECULATED)) {
+                result.append("   ### SPEC");
+            }
+            result.append("\n");
         }
     }
 

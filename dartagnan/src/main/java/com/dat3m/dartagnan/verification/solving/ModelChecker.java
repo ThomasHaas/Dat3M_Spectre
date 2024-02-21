@@ -118,7 +118,7 @@ public abstract class ModelChecker {
         analysisContext.register(RelationAnalysis.class, RelationAnalysis.fromConfig(task, analysisContext, config));
     }
 
-    private static void computeSpecificationFromProgramAssertions(Program program) {
+    protected static void computeSpecificationFromProgramAssertions(Program program) {
         // We generate a program-spec from the user-placed assertions inside the C code.
         // For litmus tests, this function should not be called.
         final List<Assert> assertions = program.getThreadEvents(Assert.class);

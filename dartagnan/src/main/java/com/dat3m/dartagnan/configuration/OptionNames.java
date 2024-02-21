@@ -40,6 +40,9 @@ public class OptionNames {
     public static final String PROPAGATE_COPY_ASSIGNMENTS = "program.processing.propagateCopyAssignments";
     public static final String REMOVE_ASSERTION_OF_TYPE = "program.processing.skipAssertionsOfType";
 
+    // Spectre
+    public static final String SPECULATION_WINDOW = "specWindow";
+
     // Program Property Options
     public static final String ALIAS_METHOD = "program.analysis.alias";
     public static final String ALIAS_GRAPHVIZ = "program.analysis.generateAliasGraph";

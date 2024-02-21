@@ -31,7 +31,8 @@ public abstract class AbstractEvent implements Event {
 
     protected AbstractEvent(AbstractEvent other) {
         copyAllMetadataFrom(other);
-        this.tags = other.tags; // TODO: Dangerous code! A Copy-on-Write Set should be used (e.g. PersistentSet/Map)
+        //this.tags = other.tags; // TODO: Dangerous code! A Copy-on-Write Set should be used (e.g. PersistentSet/Map)
+        this.tags = new HashSet<>(other.tags);
     }
 
     @Override
