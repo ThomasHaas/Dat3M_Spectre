@@ -313,6 +313,8 @@ public class Wmm {
             case SYNC_BARRIER -> intersection(r, getOrCreatePredefinedRelation(SYNCBAR), getOrCreatePredefinedRelation(SCTA));
             case SYNC_FENCE -> new SyncFence(r);
             case VLOC -> new SameVirtualLocation(r);
+            case RFX -> new ReadFromMicro(r);
+            case COX -> new CoherenceMicro(r);
             default ->
                     throw new RuntimeException(name + "is part of RelationNameRepository but it has no associated relation.");
         };

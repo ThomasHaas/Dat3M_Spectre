@@ -326,6 +326,14 @@ public final class EncodingContext {
         return formulaManager.getIntegerFormulaManager().makeVariable("co " + write.getGlobalId());
     }
 
+    public IntegerFormula orderClock(String name, Event ev) {
+        if (ev.hasTag(INIT)) {
+            return formulaManager.getIntegerFormulaManager().makeNumber(0);
+        }
+        return formulaManager.getIntegerFormulaManager().makeVariable(name + " " + ev.getGlobalId());
+    }
+
+
     public BooleanFormula edgeVariable(String name, Event first, Event second) {
         return booleanFormulaManager.makeVariable(formulaManager.escape(name) + " " + first.getGlobalId() + " " + second.getGlobalId());
     }

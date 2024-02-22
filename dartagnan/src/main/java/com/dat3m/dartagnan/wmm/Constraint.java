@@ -101,6 +101,9 @@ public interface Constraint {
         default T visitCoherence(Coherence co) { return visitDefinition(co); }
         default T visitSameLocation(SameLocation loc) { return visitDefinition(loc); }
         default T visitReadFrom(ReadFrom rf) { return visitDefinition(rf); }
+        // --- Microarchitecture definitions
+        default T visitCoherenceMicro(CoherenceMicro co) { return visitDefinition(co); }
+        default T visitReadFromMicro(ReadFromMicro rf) { return visitDefinition(rf); }
         // --- Target-specific definitions
         default T visitCASDependency(CASDependency casDep) { return visitDefinition(casDep); } // IMM
         default T visitLinuxCriticalSections(LinuxCriticalSections rscs) { return visitDefinition(rscs); } // Linux

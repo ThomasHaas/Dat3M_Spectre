@@ -52,6 +52,9 @@ public class RelationNameRepository {
     public static final String SYNC_FENCE = "sync_fence";
     public static final String SYNCBAR = "syncbar";
     public static final String VLOC = "vloc";
+    // Speculation semantics
+    public static final String RFX = "rfx";
+    public static final String COX = "cox";
 
     public static final ImmutableSet<String> RELATION_NAMES;
 

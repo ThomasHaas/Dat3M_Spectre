@@ -1043,6 +1043,36 @@ public class RelationAnalysis {
             }
             return new Knowledge(must, enableMustSets ? must : EventGraph.empty());
         }
+
+        @Override
+        public Knowledge visitCoherenceMicro(CoherenceMicro co) {
+            EventGraph may = new EventGraph();
+            List<MemoryCoreEvent> events = program.getThreadEvents(MemoryCoreEvent.class);
+            for (MemoryCoreEvent e1 : events) {
+                for (MemoryCoreEvent e2 : events) {
+                    if (e1 != e2 && alias.mayAlias(e1, e2) && !exec.areMutuallyExclusive(e1, e2)) {
+                        may.add(e1, e2);
+                    }
+                }
+            }
+            EventGraph must = new EventGraph();
+            return new Knowledge(may, enableMustSets ? must : EventGraph.empty());
+        }
+
+        @Override
+        public Knowledge visitReadFromMicro(ReadFromMicro rf) {
+            EventGraph may = new EventGraph();
+            List<MemoryCoreEvent> events = program.getThreadEvents(MemoryCoreEvent.class);
+            for (MemoryCoreEvent e1 : events) {
+                for (MemoryCoreEvent e2 : events) {
+                    if (e1 != e2 && alias.mayAlias(e1, e2) && !exec.areMutuallyExclusive(e1, e2)) {
+                        may.add(e1, e2);
+                    }
+                }
+            }
+            EventGraph must = new EventGraph();
+            return new Knowledge(may, enableMustSets ? must : EventGraph.empty());
+        }
     }
 
     public final class Propagator implements Definition.Visitor<Delta> {
