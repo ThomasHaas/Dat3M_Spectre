@@ -19,6 +19,8 @@ import com.dat3m.dartagnan.program.memory.VirtualMemoryObject;
 import com.dat3m.dartagnan.utils.dependable.DependencyGraph;
 import com.dat3m.dartagnan.verification.Context;
 import com.dat3m.dartagnan.verification.VerificationTask;
+import com.dat3m.dartagnan.verification.spectre.CoherenceMicro;
+import com.dat3m.dartagnan.verification.spectre.ReadFromMicro;
 import com.dat3m.dartagnan.witness.WitnessGraph;
 import com.dat3m.dartagnan.wmm.Constraint;
 import com.dat3m.dartagnan.wmm.Definition;
@@ -1065,7 +1067,7 @@ public class RelationAnalysis {
             List<MemoryCoreEvent> events = program.getThreadEvents(MemoryCoreEvent.class);
             for (MemoryCoreEvent e1 : events) {
                 for (MemoryCoreEvent e2 : events) {
-                    if (e1 != e2 && alias.mayAlias(e1, e2) && !exec.areMutuallyExclusive(e1, e2)) {
+                    if (!e2.hasTag(INIT) && e1 != e2 && alias.mayAlias(e1, e2) && !exec.areMutuallyExclusive(e1, e2)) {
                         may.add(e1, e2);
                     }
                 }

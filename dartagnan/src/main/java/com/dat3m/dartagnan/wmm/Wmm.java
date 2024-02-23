@@ -2,6 +2,8 @@ package com.dat3m.dartagnan.wmm;
 
 import com.dat3m.dartagnan.program.event.Tag;
 import com.dat3m.dartagnan.program.filter.Filter;
+import com.dat3m.dartagnan.verification.spectre.CoherenceMicro;
+import com.dat3m.dartagnan.verification.spectre.ReadFromMicro;
 import com.dat3m.dartagnan.wmm.axiom.Axiom;
 import com.dat3m.dartagnan.wmm.definition.*;
 import com.google.common.collect.ImmutableSet;

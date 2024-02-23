@@ -14,6 +14,8 @@ import com.dat3m.dartagnan.program.event.core.MemoryCoreEvent;
 import com.dat3m.dartagnan.program.event.core.RMWStoreExclusive;
 import com.dat3m.dartagnan.program.filter.Filter;
 import com.dat3m.dartagnan.utils.dependable.DependencyGraph;
+import com.dat3m.dartagnan.verification.spectre.CoherenceMicro;
+import com.dat3m.dartagnan.verification.spectre.ReadFromMicro;
 import com.dat3m.dartagnan.wmm.Constraint;
 import com.dat3m.dartagnan.wmm.Definition;
 import com.dat3m.dartagnan.wmm.Relation;
@@ -665,9 +667,9 @@ public class WmmEncoder implements Encoder {
                     enc.add(bmgr.equivalence(pairingCond, bmgr.or(coF, coB)));
                     if (idl) {
                         enc.add(bmgr.implication(coF, x.hasTag(INIT) || transCo.contains(x, z) ? bmgr.makeTrue()
-                                : imgr.lessThan(context.orderClock(relName, x), context.orderClock(relName, z))));
+                                : imgr.lessThan(context.clockVariable(relName, x), context.clockVariable(relName, z))));
                         enc.add(bmgr.implication(coB, z.hasTag(INIT) || transCo.contains(z, x) ? bmgr.makeTrue()
-                                : imgr.lessThan(context.orderClock(relName, z), context.orderClock(relName, x))));
+                                : imgr.lessThan(context.clockVariable(relName, z), context.clockVariable(relName, x))));
                     } else {
                         enc.add(bmgr.or(bmgr.not(coF), bmgr.not(coB)));
                         if (!mustSet.contains(x, z) && !mustSet.contains(z, x)) {

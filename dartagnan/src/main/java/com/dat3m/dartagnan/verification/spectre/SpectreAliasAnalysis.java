@@ -15,7 +15,8 @@ public class SpectreAliasAnalysis {
         return new AliasAnalysis() {
             @Override
             public boolean mustAlias(MemoryCoreEvent a, MemoryCoreEvent b) {
-                if (a.hasTag(Tag.SPECULATED) || b.hasTag(Tag.SPECULATED)) {
+                if (a.hasTag(Tag.SPECULATED) || b.hasTag(Tag.SPECULATED)
+                        || a instanceof AbstractInit || b instanceof AbstractInit) {
                     return false;
                 }
                 return inner.mustAlias(a, b);
@@ -23,12 +24,14 @@ public class SpectreAliasAnalysis {
 
             @Override
             public boolean mayAlias(MemoryCoreEvent a, MemoryCoreEvent b) {
-                if (a.hasTag(Tag.SPECULATED) || b.hasTag(Tag.SPECULATED)) {
+                if (a.hasTag(Tag.SPECULATED) || b.hasTag(Tag.SPECULATED)
+                        || a instanceof AbstractInit || b instanceof AbstractInit) {
                     return true;
                 }
                 return inner.mayAlias(a, b);
             }
         };
+
 
     }
 }
