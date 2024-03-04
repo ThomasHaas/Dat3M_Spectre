@@ -1,0 +1,56 @@
+SC-spec
+(*
+    NOTE: The following assumes programs with a single-thread executing code.
+    When extending to multi-thread program, we would need to prohibit reads from speculated events of other threads.
+    Also, if we care only about single-threaded semantics, we can simplify the model (e.g., "co = po & loc" holds
+    in single-threaded programs).
+*)
+
+(* ======================= SC with speculation semantics ======================= *)
+let rollbackAfter = [SPEC];po;[ROLLBACK];po
+let com = rf | fr | co
+let hb = (po | com) \ rollbackAfter
+
+acyclic hb as sc
+empty (rf & rollbackAfter) // No read beyond rollback
+
+(* ======================= Micro-architectural primitives ======================= *)
+let miss = new() & [R]
+let hit = [R] \ miss
+let mW = [W] | miss
+let mR = [M] \ [IW]
+
+// Define cox
+let cox = (new() & (mW;loc;mW) | ([IW];loc;mW)) \ id
+empty (cox;cox \ cox)
+empty ((mW;loc;mW) \ (cox | cox^-1 | id))
+acyclic cox
+
+// Define rfx
+let rfx = (new() \ id) & (mW;loc;mR)
+empty ((rfx;rfx^-1) \ id)
+
+// Define frx
+let initMR = mR \ [range(rfx)]
+let frx = (rfx^-1;cox | initMR;loc;mW) \ id
+empty (initMR;loc;[IW])
+
+(* ======================= Microarchitectural SC ======================= *)
+let comx = rfx | cox | frx
+let hbx = po | comx
+acyclic hbx as micro-sc
+
+
+(* ======================= Leakage ======================= *)
+// We assume all maximal writes are observable by the attacker
+let observable = new() & mW
+empty (observable;cox)
+
+flag ~empty ([SPEC];rfx;[~SPEC]) as general-leakage
+
+(* Transmitter patterns *)
+flag ~empty(observable) as address-transmitter
+flag ~empty(addr;observable) as data-transmitter
+flag ~empty(ctrl;observable) as control-transmitter
+flag ~empty(addr;ctrl;observable) as universal-control-transmitter
+flag ~empty(addr;addr;observable) as universal-data-transmitter

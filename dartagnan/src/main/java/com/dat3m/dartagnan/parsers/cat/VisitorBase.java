@@ -143,9 +143,10 @@ class VisitorBase extends CatBaseVisitor<Object> {
         return ctx.e.accept(this);
     }
 
+    private int freeCtr = 0;
     @Override
     public Object visitExprNew(ExprNewContext ctx) {
-        return addDefinition(new Free(wmm.newRelation()));
+        return addDefinition(new Free(wmm.newRelation("free#" + (freeCtr++))));
     }
 
     @Override
@@ -295,7 +296,8 @@ class VisitorBase extends CatBaseVisitor<Object> {
         Relation definedRelation = definition.getDefinedRelation();
         String term = definition.getTerm();
         Relation mappedRelation = termMap.get(definition.getTerm());
-        if (mappedRelation == null) {
+        return wmm.addDefinition(definition);
+        /*if (mappedRelation == null) {
             // This is a new definition.
             termMap.put(term, definedRelation);
             return wmm.addDefinition(definition);
@@ -304,7 +306,7 @@ class VisitorBase extends CatBaseVisitor<Object> {
             // to the Wmm and instead delete the relation it is defining (redundantly)
             wmm.deleteRelation(definedRelation);
             return mappedRelation;
-        }
+        }*/
     }
 
     private void checkNoRecursion(ExpressionContext c) {

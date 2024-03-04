@@ -9,7 +9,6 @@ import com.dat3m.dartagnan.program.IRHelper;
 import com.dat3m.dartagnan.program.Program;
 import com.dat3m.dartagnan.program.Register;
 import com.dat3m.dartagnan.program.event.*;
-import com.dat3m.dartagnan.program.event.core.Assert;
 import com.dat3m.dartagnan.program.event.core.CondJump;
 import com.dat3m.dartagnan.program.event.core.Label;
 import com.dat3m.dartagnan.program.event.core.annotations.CodeAnnotation;
@@ -95,7 +94,7 @@ public class SpeculationInstrumentation implements ProgramProcessor {
                 break;
             }
 
-            if (cur instanceof CodeAnnotation || cur instanceof Assert || (cur instanceof Label && cur != start)) {
+            if (cur instanceof CodeAnnotation /* || cur instanceof Assert */ || (cur instanceof Label && cur != start)) {
                 cur = cur.getSuccessor();
                 continue;
             } else if (cur instanceof CondJump jump && jump.isGoto()) {
@@ -120,6 +119,7 @@ public class SpeculationInstrumentation implements ProgramProcessor {
             cur = cur.getSuccessor();
         }
         replacer.pop();
+        specEvents.add(EventFactory.newFence("ROLLBACK"));
         specEvents.add(EventFactory.newGoto(speculationEnd));
         return specEvents;
     }

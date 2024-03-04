@@ -20,7 +20,6 @@ import com.dat3m.dartagnan.program.event.lang.pthread.Lock;
 import com.dat3m.dartagnan.program.event.lang.pthread.Unlock;
 import com.dat3m.dartagnan.program.event.lang.svcomp.BeginAtomic;
 import com.dat3m.dartagnan.program.event.lang.svcomp.EndAtomic;
-import com.dat3m.dartagnan.verification.spectre.AbstractInit;
 
 public interface EventVisitor<T> {
 
@@ -43,7 +42,6 @@ public interface EventVisitor<T> {
     default T visitLoad(Load e) { return visitMemCoreEvent(e); }
     default T visitStore(Store e) { return visitMemCoreEvent(e); }
     default T visitInit(Init e) { return visitStore(e); }
-    default T visitAbstractInit(AbstractInit e) { return visitStore(e); }
     // RMW core events
     default T visitRMWStore(RMWStore e) { return visitStore(e); }
     default T visitRMWStoreExclusive(RMWStoreExclusive e) { return visitStore(e); }

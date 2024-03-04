@@ -3,8 +3,6 @@ package com.dat3m.dartagnan.wmm;
 import com.dat3m.dartagnan.encoding.EncodingContext;
 import com.dat3m.dartagnan.verification.Context;
 import com.dat3m.dartagnan.verification.VerificationTask;
-import com.dat3m.dartagnan.verification.spectre.CoherenceMicro;
-import com.dat3m.dartagnan.verification.spectre.ReadFromMicro;
 import com.dat3m.dartagnan.wmm.analysis.RelationAnalysis;
 import com.dat3m.dartagnan.wmm.axiom.*;
 import com.dat3m.dartagnan.wmm.definition.*;
@@ -104,9 +102,6 @@ public interface Constraint {
         default T visitCoherence(Coherence co) { return visitDefinition(co); }
         default T visitSameLocation(SameLocation loc) { return visitDefinition(loc); }
         default T visitReadFrom(ReadFrom rf) { return visitDefinition(rf); }
-        // --- Microarchitecture definitions
-        default T visitCoherenceMicro(CoherenceMicro co) { return visitDefinition(co); }
-        default T visitReadFromMicro(ReadFromMicro rf) { return visitDefinition(rf); }
         // --- Target-specific definitions
         default T visitCASDependency(CASDependency casDep) { return visitDefinition(casDep); } // IMM
         default T visitLinuxCriticalSections(LinuxCriticalSections rscs) { return visitDefinition(rscs); } // Linux

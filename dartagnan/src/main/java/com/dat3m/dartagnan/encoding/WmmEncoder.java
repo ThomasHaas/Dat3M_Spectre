@@ -15,8 +15,6 @@ import com.dat3m.dartagnan.program.event.core.RMWStoreExclusive;
 import com.dat3m.dartagnan.program.filter.Filter;
 import com.dat3m.dartagnan.utils.Utils;
 import com.dat3m.dartagnan.utils.dependable.DependencyGraph;
-import com.dat3m.dartagnan.verification.spectre.CoherenceMicro;
-import com.dat3m.dartagnan.verification.spectre.ReadFromMicro;
 import com.dat3m.dartagnan.wmm.Constraint;
 import com.dat3m.dartagnan.wmm.Definition;
 import com.dat3m.dartagnan.wmm.Relation;
@@ -39,7 +37,6 @@ import java.util.*;
 import static com.dat3m.dartagnan.configuration.OptionNames.ENABLE_ACTIVE_SETS;
 import static com.dat3m.dartagnan.program.event.Tag.*;
 import static com.dat3m.dartagnan.wmm.RelationNameRepository.RF;
-import static com.dat3m.dartagnan.wmm.RelationNameRepository.RFX;
 import static com.dat3m.dartagnan.wmm.utils.EventGraph.difference;
 import static com.google.common.base.Verify.verify;
 import static java.lang.Boolean.TRUE;
@@ -542,38 +539,6 @@ public class WmmEncoder implements Encoder {
         }
 
         @Override
-        public Void visitReadFromMicro(ReadFromMicro rfDef) {
-            final Relation rfx = rfDef.getDefinedRelation();
-            Map<MemoryEvent, List<BooleanFormula>> edgeMap = new HashMap<>();
-            EncodingContext.EdgeEncoder edge = context.edge(rfx);
-
-            ra.getKnowledge(rfx).getMaySet().apply((e1, e2) -> {
-                MemoryCoreEvent w = (MemoryCoreEvent) e1;
-                MemoryCoreEvent r = (MemoryCoreEvent) e2;
-                BooleanFormula e = edge.encode(w, r);
-                BooleanFormula sameAddress = context.sameAddress(w, r);
-                edgeMap.computeIfAbsent(r, key -> new ArrayList<>()).add(e);
-                enc.add(bmgr.implication(e, bmgr.and(execution(w, r), sameAddress)));
-            });
-
-            for (MemoryEvent r : edgeMap.keySet()) {
-                List<BooleanFormula> edges = edgeMap.get(r);
-                int num = edges.size();
-                String rPrefix = "s(" + RFX + ",E" + r.getGlobalId() + ",";
-                BooleanFormula lastSeqVar = edges.get(0);
-                for (int i = 1; i < num; i++) {
-                    BooleanFormula newSeqVar = bmgr.makeVariable(rPrefix + i + ")");
-                    enc.add(bmgr.equivalence(newSeqVar, bmgr.or(lastSeqVar, edges.get(i))));
-                    enc.add(bmgr.not(bmgr.and(edges.get(i), lastSeqVar)));
-                    lastSeqVar = newSeqVar;
-                }
-                // FIXME: Need abstract init event for all accesses outside of the memory range.
-                enc.add(bmgr.implication(context.execution(r), lastSeqVar));
-            }
-            return null;
-        }
-
-        @Override
         public Void visitCoherence(Coherence coDef) {
             final Relation co = coDef.getDefinedRelation();
             boolean idl = !context.useSATEncoding;
@@ -623,66 +588,6 @@ public class WmmEncoder implements Encoder {
                         enc.add(bmgr.or(bmgr.not(coF), bmgr.not(coB)));
                         if (!mustSet.contains(x, z) && !mustSet.contains(z, x)) {
                             for (MemoryEvent y : allWrites) {
-                                if (forwardPossible && maySet.contains(x, y) && maySet.contains(y, z)) {
-                                    enc.add(bmgr.implication(bmgr.and(edge.encode(x, y), edge.encode(y, z)), coF));
-                                }
-                                if (backwardPossible && maySet.contains(y, x) && maySet.contains(z, y)) {
-                                    enc.add(bmgr.implication(bmgr.and(edge.encode(y, x), edge.encode(z, y)), coB));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public Void visitCoherenceMicro(CoherenceMicro coDef) {
-            final Relation cox = coDef.getDefinedRelation();
-            final String relName = cox.getName().orElseThrow();
-            boolean idl = !context.useSATEncoding;
-            List<MemoryCoreEvent> memoryEvents = program.getThreadEvents(MemoryCoreEvent.class).stream()
-                    .sorted(Comparator.comparingInt(Event::getGlobalId))
-                    .toList();
-            EncodingContext.EdgeEncoder edge = context.edge(cox);
-            EventGraph maySet = ra.getKnowledge(cox).getMaySet();
-            EventGraph mustSet = ra.getKnowledge(cox).getMustSet();
-            EventGraph transCo = idl ? ra.findTransitivelyImpliedCo(cox) : null;
-            IntegerFormulaManager imgr = idl ? context.getFormulaManager().getIntegerFormulaManager() : null;
-            if (idl) {
-                // ---- Encode clock conditions (init = 0, non-init > 0) ----
-                NumeralFormula.IntegerFormula zero = imgr.makeNumber(0);
-                for (MemoryCoreEvent w : memoryEvents) {
-                    NumeralFormula.IntegerFormula clock = context.clockVariable(relName, w);
-                    enc.add(w.hasTag(INIT) ? imgr.equal(clock, zero) : imgr.greaterThan(clock, zero));
-                }
-            }
-            // ---- Encode micro coherences ----
-            for (int i = 0; i < memoryEvents.size() - 1; i++) {
-                MemoryCoreEvent x = memoryEvents.get(i);
-                for (MemoryCoreEvent z : memoryEvents.subList(i + 1, memoryEvents.size())) {
-                    boolean forwardPossible = maySet.contains(x, z);
-                    boolean backwardPossible = maySet.contains(z, x);
-                    if (!forwardPossible && !backwardPossible) {
-                        continue;
-                    }
-                    BooleanFormula execPair = execution(x, z);
-                    BooleanFormula sameAddress = context.sameAddress(x, z);
-                    BooleanFormula pairingCond = bmgr.and(execPair, sameAddress);
-                    BooleanFormula coF = forwardPossible ? edge.encode(x, z) : bmgr.makeFalse();
-                    BooleanFormula coB = backwardPossible ? edge.encode(z, x) : bmgr.makeFalse();
-                    // Totality
-                    enc.add(bmgr.equivalence(pairingCond, bmgr.or(coF, coB)));
-                    if (idl) {
-                        enc.add(bmgr.implication(coF, x.hasTag(INIT) || transCo.contains(x, z) ? bmgr.makeTrue()
-                                : imgr.lessThan(context.clockVariable(relName, x), context.clockVariable(relName, z))));
-                        enc.add(bmgr.implication(coB, z.hasTag(INIT) || transCo.contains(z, x) ? bmgr.makeTrue()
-                                : imgr.lessThan(context.clockVariable(relName, z), context.clockVariable(relName, x))));
-                    } else {
-                        enc.add(bmgr.or(bmgr.not(coF), bmgr.not(coB)));
-                        if (!mustSet.contains(x, z) && !mustSet.contains(z, x)) {
-                            for (MemoryEvent y : memoryEvents) {
                                 if (forwardPossible && maySet.contains(x, y) && maySet.contains(y, z)) {
                                     enc.add(bmgr.implication(bmgr.and(edge.encode(x, y), edge.encode(y, z)), coF));
                                 }

@@ -10,7 +10,6 @@ import com.dat3m.dartagnan.program.event.core.threading.ThreadCreate;
 import com.dat3m.dartagnan.program.event.core.threading.ThreadStart;
 import com.dat3m.dartagnan.program.event.lang.svcomp.BeginAtomic;
 import com.dat3m.dartagnan.program.event.lang.svcomp.EndAtomic;
-import com.dat3m.dartagnan.verification.spectre.AbstractInit;
 import org.sosy_lab.common.configuration.Configuration;
 
 import java.util.Arrays;
@@ -39,8 +38,7 @@ public class CoreCodeVerification implements FunctionProcessor {
             Assert.class,
             ThreadCreate.class, ThreadArgument.class, ThreadStart.class,
             FenceWithId.class, // For PTX and Vulkan
-            BeginAtomic.class, EndAtomic.class,
-            AbstractInit.class
+            BeginAtomic.class, EndAtomic.class
             // We add SVCOMP atomic blocks here as well, despite them not being part of the core package.
             // TODO: We might want to find a more systematic way to extend the core with these custom events.
     ));

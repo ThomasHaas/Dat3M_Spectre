@@ -2,8 +2,6 @@ package com.dat3m.dartagnan.wmm;
 
 import com.dat3m.dartagnan.program.event.Tag;
 import com.dat3m.dartagnan.program.filter.Filter;
-import com.dat3m.dartagnan.verification.spectre.CoherenceMicro;
-import com.dat3m.dartagnan.verification.spectre.ReadFromMicro;
 import com.dat3m.dartagnan.wmm.axiom.Axiom;
 import com.dat3m.dartagnan.wmm.definition.*;
 import com.google.common.collect.ImmutableSet;
@@ -251,8 +249,6 @@ public class Wmm {
             case SYNC_BARRIER -> intersection(r, getOrCreatePredefinedRelation(SYNCBAR), getOrCreatePredefinedRelation(SCTA));
             case SYNC_FENCE -> new SyncFence(r);
             case VLOC -> new SameVirtualLocation(r);
-            case RFX -> new ReadFromMicro(r);
-            case COX -> new CoherenceMicro(r);
             default ->
                     throw new RuntimeException(name + "is part of RelationNameRepository but it has no associated relation.");
         };

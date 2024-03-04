@@ -17,12 +17,10 @@ import com.dat3m.dartagnan.program.event.core.*;
 import com.dat3m.dartagnan.program.memory.MemoryObject;
 import com.dat3m.dartagnan.verification.Context;
 import com.dat3m.dartagnan.verification.VerificationTask;
-import com.dat3m.dartagnan.verification.spectre.AbstractInit;
 import com.dat3m.dartagnan.wmm.Relation;
 import com.dat3m.dartagnan.wmm.analysis.RelationAnalysis;
 import com.dat3m.dartagnan.wmm.axiom.Acyclicity;
 import com.dat3m.dartagnan.wmm.utils.EventGraph;
-import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -32,7 +30,10 @@ import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static com.dat3m.dartagnan.configuration.OptionNames.*;
 import static com.dat3m.dartagnan.program.event.Tag.INIT;
@@ -298,26 +299,10 @@ public final class EncodingContext {
     }
 
     public BooleanFormula sameAddress(MemoryCoreEvent first, MemoryCoreEvent second) {
-        if (first instanceof AbstractInit) {
-            if (second instanceof AbstractInit) {
-                return booleanFormulaManager.makeTrue();
-            }
-            final List<BooleanFormula> enc = new ArrayList<>();
-            final BitvectorFormulaManager bvmgr = formulaManager.getBitvectorFormulaManager();
-            for (BigInteger addr : initAddresses) {
-                final BitvectorFormula addrForm = bvmgr.makeBitvector(64, addr);
-                enc.add(booleanFormulaManager.not(equal(addrForm, address(second))));
-            }
-            return booleanFormulaManager.and(enc);
-        } else if (second instanceof AbstractInit) {
-            return sameAddress(second, first);
-        }
-
         return aliasAnalysis.mustAlias(first, second) ? booleanFormulaManager.makeTrue() : equal(address(first), address(second));
     }
 
     public Formula address(MemoryEvent event) {
-        Preconditions.checkArgument(!(event instanceof AbstractInit));
         return addresses.get(event);
     }
 
