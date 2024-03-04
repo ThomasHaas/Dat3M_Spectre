@@ -13,6 +13,7 @@ import com.dat3m.dartagnan.program.event.core.FenceWithId;
 import com.dat3m.dartagnan.program.event.core.MemoryCoreEvent;
 import com.dat3m.dartagnan.program.event.core.RMWStoreExclusive;
 import com.dat3m.dartagnan.program.filter.Filter;
+import com.dat3m.dartagnan.utils.Utils;
 import com.dat3m.dartagnan.utils.dependable.DependencyGraph;
 import com.dat3m.dartagnan.verification.spectre.CoherenceMicro;
 import com.dat3m.dartagnan.verification.spectre.ReadFromMicro;
@@ -73,7 +74,7 @@ public class WmmEncoder implements Encoder {
         } else {
             encoder.initializeAlternative();
         }
-        logger.info("Finished active sets in {}ms", System.currentTimeMillis() - t0);
+        logger.info("Finished active sets in {}", Utils.toTimeString(System.currentTimeMillis() - t0));
         RelationAnalysis ra = context.getAnalysisContext().get(RelationAnalysis.class);
         logger.info("Number of unknown edges: {}", context.getTask().getMemoryModel().getRelations().stream()
                 .filter(r -> !r.isInternal())
@@ -153,6 +154,14 @@ public class WmmEncoder implements Encoder {
             final Relation rel = def.getDefinedRelation();
             EncodingContext.EdgeEncoder edge = context.edge(rel);
             encodeSets.get(rel).apply((e1, e2) -> enc.add(bmgr.equivalence(edge.encode(e1, e2), execution(e1, e2))));
+            return null;
+        }
+
+        @Override
+        public Void visitFree(Free def) {
+            final Relation rel = def.getDefinedRelation();
+            EncodingContext.EdgeEncoder edge = context.edge(rel);
+            encodeSets.get(rel).apply((e1, e2) -> enc.add(bmgr.implication(edge.encode(e1, e2), execution(e1, e2))));
             return null;
         }
 
