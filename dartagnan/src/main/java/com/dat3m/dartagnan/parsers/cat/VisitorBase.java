@@ -33,8 +33,6 @@ class VisitorBase extends CatBaseVisitor<Object> {
     private final Map<String, Integer> nameOccurrenceCounter = new HashMap<>();
     // Used to handle recursive definitions properly
     private Relation relationToBeDefined;
-    // Used as optimization to avoid creating multiple relations with (structurally) identical definitions.
-    private final Map<String, Relation> termMap = new HashMap<>();
 
     VisitorBase() {
         this.wmm = new Wmm();
@@ -143,10 +141,9 @@ class VisitorBase extends CatBaseVisitor<Object> {
         return ctx.e.accept(this);
     }
 
-    private int freeCtr = 0;
     @Override
     public Object visitExprNew(ExprNewContext ctx) {
-        return addDefinition(new Free(wmm.newRelation("free#" + (freeCtr++))));
+        return addDefinition(new Free(wmm.newRelation()));
     }
 
     @Override
@@ -293,20 +290,7 @@ class VisitorBase extends CatBaseVisitor<Object> {
     // ============================ Utility ============================
 
     private Relation addDefinition(Definition definition) {
-        Relation definedRelation = definition.getDefinedRelation();
-        String term = definition.getTerm();
-        Relation mappedRelation = termMap.get(definition.getTerm());
         return wmm.addDefinition(definition);
-        /*if (mappedRelation == null) {
-            // This is a new definition.
-            termMap.put(term, definedRelation);
-            return wmm.addDefinition(definition);
-        } else {
-            // We created an already existing definition, so we do not add this definition
-            // to the Wmm and instead delete the relation it is defining (redundantly)
-            wmm.deleteRelation(definedRelation);
-            return mappedRelation;
-        }*/
     }
 
     private void checkNoRecursion(ExpressionContext c) {
