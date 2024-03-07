@@ -48,6 +48,13 @@ empty (observable;cox)
 
 flag ~empty ([SPEC];rfx;[~SPEC]) as general-leakage
 
+// We need to generalize the standard notion of dependency to include
+// dependencies transferred over memory.
+let data-chain = (data;rf)*
+let addr = data-chain;addr
+let ctrl = data-chain;ctrl
+let data = data-chain;data
+
 (* Transmitter patterns *)
 flag ~empty(observable) as address-transmitter
 flag ~empty(addr;observable) as data-transmitter
