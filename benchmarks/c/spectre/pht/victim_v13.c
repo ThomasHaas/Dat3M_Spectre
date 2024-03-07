@@ -19,7 +19,7 @@ int is_idx_safe(int idx) {
 void victim_v13(int idx) {
     if (is_idx_safe(idx)) {
         int var = A[idx];
-        temp &= B[var]; // TODO: Needs uninit reads??? (Doesn't make much sense but without this line, we get a bug)
+        temp &= B[var];
         __VERIFIER_assert(var != SECRET_VALUE);
     }
 }

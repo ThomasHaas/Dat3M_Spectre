@@ -12,7 +12,6 @@ volatile uint8_t temp = 0;
 
 void victim_v8(int idx) {
     int var = A[idx < SIZE ? (idx + 1) : 0];
-    // TODO: Needs support for uninit reads
     temp &= B[var];
     __VERIFIER_assert(var != SECRET_VALUE);
 }

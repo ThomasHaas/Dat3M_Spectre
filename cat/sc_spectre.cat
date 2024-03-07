@@ -9,7 +9,7 @@ SC-spec
 (* ======================= SC with speculation semantics ======================= *)
 let rollbackAfter = [SPEC];po;[ROLLBACK];po
 let com = rf | fr | co
-let hb = (po | com) \ rollbackAfter
+let hb = (po | com) \ (rollbackAfter | rollbackAfter^-1)
 
 acyclic hb as sc
 empty (rf & rollbackAfter) // No read beyond rollback
