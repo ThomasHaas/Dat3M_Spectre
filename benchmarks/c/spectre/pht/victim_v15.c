@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "dat3m.h"
+#include <dat3m.h>
 
 #define SIZE 16
 #define SECRET_VALUE 42
