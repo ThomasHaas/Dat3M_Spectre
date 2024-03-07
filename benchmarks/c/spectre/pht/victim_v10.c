@@ -16,9 +16,7 @@ void victim_v10(int idx, int guess) {
         if (var == guess) {
             temp &= B[0];
         }
-        // I think here we need a new assert, to catch this vulnerability
-        // TODO: Always breaks cause "guess == SECRET_VALUE" is easily satisfied
-        __VERIFIER_assert((var != SECRET_VALUE) & (guess != SECRET_VALUE));
+        __VERIFIER_assert((var != SECRET_VALUE) | (var != guess));
     }
 }
 
