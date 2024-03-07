@@ -100,7 +100,6 @@ public class ProcessingManager implements ProgramProcessor {
                 ),*/
                 ProgramProcessor.fromFunctionProcessor(sccp, Target.FUNCTIONS, false),
                 LoopUnrolling.fromConfig(config), // We keep unrolling global for now
-                SpeculationInstrumentation.fromConfig(config),
                 printAfterUnrolling ? DebugPrint.withHeader("After loop unrolling", Printer.Mode.ALL) : null,
                 //dynamicPureLoopCutting ? DynamicPureLoopCutting.fromConfig(config) : null,
                 ProgramProcessor.fromFunctionProcessor(
@@ -116,6 +115,7 @@ public class ProcessingManager implements ProgramProcessor {
                 //RemoveUnusedMemory.newInstance(),
                 //ProgramProcessor.fromFunctionProcessor(MemToReg.fromConfig(config), Target.THREADS, true),
                 MemoryAllocation.newInstance(),
+                SpeculationInstrumentation.fromConfig(config),
                 // --- Statistics + verification ---
                 IdReassignment.newInstance(), // Normalize used Ids (remove any gaps)
                 printAfterProcessing ? DebugPrint.withHeader("After processing", Printer.Mode.THREADS) : null,

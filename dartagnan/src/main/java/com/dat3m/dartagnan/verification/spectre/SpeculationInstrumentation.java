@@ -39,7 +39,7 @@ public class SpeculationInstrumentation implements ProgramProcessor {
 
     @Override
     public void run(Program program) {
-        program.getFunctions().forEach(this::run);
+        program.getThreads().forEach(this::run);
     }
 
     private void run(Function function) {

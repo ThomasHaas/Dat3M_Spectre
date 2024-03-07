@@ -14,7 +14,6 @@ volatile uint8_t temp = 0;
 void victim_v11(int idx) {
     if (idx < SIZE) {
         int var = A[idx];
-        // TODO: (1) Memcpy does not preserve SPEC tag. (2) Uninit reads are a problem
         temp = memcpy(&temp, B + var, 1);
         __VERIFIER_assert(var != SECRET_VALUE);
     }
